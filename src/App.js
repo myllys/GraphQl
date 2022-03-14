@@ -1,25 +1,45 @@
-import logo from './logo.svg';
+import React, { useState, useEffect } from 'react';
 import './App.css';
+import {
+  useQuery,
+  gql,
+} from "@apollo/client";
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+  const GET_JOBS = gql`
+    query GetJobs {
+       cities {
+      name
+    jobs{
+    title
+    applyUrl
+    company{
+      name
+      websiteUrl
+    }
+    }
+    }
+    }`;
 
+  const { loading, error, data } = useQuery(GET_JOBS);
+
+if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error :(</p>;
+ return (
+      data.cities.map((city, id) =>
+      <div>
+  <h1 key={id}>{city.name}</h1>
+    {data.cities[id].jobs.map((job, id) => {
+        return(
+            <>
+            <h3 key={id}>{job.title}</h3>
+            <h5>COMPANY: {job.company.name}</h5>
+            <a>{job.applyUrl}</a>
+            </>
+            )
+    }
+)}
+</div>
+  ))
+}
 export default App;
